@@ -22,14 +22,14 @@ static int newbytes(lua_State *L) {
 static int getsize(lua_State *L) {
   Bytes *b = (Bytes *)luaL_checkudata(L, 1, "toolbox.bytes");
   luaL_argcheck(L, b != NULL, 1, "`bytes` expected");
-  lua_pushinteger(L, b->size);
+  lua_pushinteger(L, 0);
   return 1;
 }
 
 static int tostring(lua_State *L) {
   Bytes *b = (Bytes *)luaL_checkudata(L, 1, "toolbox.bytes");
 
-  lua_pushfstring(L, "bytes(%d)", b->size);
+  lua_pushfstring(L, "bytes(%d)", 0);
 
   return 1;
 }
