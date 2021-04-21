@@ -4,4 +4,4 @@ build:
 	luarocks make
 
 test:
-	busted spec/*
+	busted --shuffle-tests spec/*
