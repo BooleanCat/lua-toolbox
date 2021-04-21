@@ -7,6 +7,10 @@
 #define FALSE 0
 #define TRUE  1
 
+const char *BYTES_METATABLE_HANDLE = "toolbox.bytes";
+
+#define checkbytes(L, i) (Bytes *)luaL_checkudata(L, i, BYTES_METATABLE_HANDLE)
+
 typedef struct Bytes {
   int size;
   char *data;
@@ -17,7 +21,7 @@ static int newbytesempty(lua_State *L) {
   b->size = 0;
   b->data = NULL;
 
-  luaL_getmetatable(L, "toolbox.bytes");
+  luaL_getmetatable(L, BYTES_METATABLE_HANDLE);
   lua_setmetatable(L, -2);
 
   return 1;
@@ -30,7 +34,7 @@ static int newbytessized(lua_State *L, size_t size) {
 
   memset(b->data, 0, sizeof(char) * b->size);
 
-  luaL_getmetatable(L, "toolbox.bytes");
+  luaL_getmetatable(L, BYTES_METATABLE_HANDLE);
   lua_setmetatable(L, -2);
 
   return 1;
@@ -43,7 +47,7 @@ static int newbytesstring(lua_State *L, const char *s, size_t l) {
 
   memcpy((void *)b->data, (void *)s, sizeof(char) * l);
 
-  luaL_getmetatable(L, "toolbox.bytes");
+  luaL_getmetatable(L, BYTES_METATABLE_HANDLE);
   lua_setmetatable(L, -2);
 
   return 1;
@@ -68,14 +72,14 @@ static int newbytes(lua_State *L) {
 }
 
 static int getsize(lua_State *L) {
-  Bytes *b = (Bytes *)luaL_checkudata(L, 1, "toolbox.bytes");
+  Bytes *b = checkbytes(L, 1);
   luaL_argcheck(L, b != NULL, 1, "`bytes` expected");
   lua_pushinteger(L, b->size);
   return 1;
 }
 
 static int tostring(lua_State *L) {
-  Bytes *b = (Bytes *)luaL_checkudata(L, 1, "toolbox.bytes");
+  Bytes *b = checkbytes(L, 1);
 
   if (b->size == 0) {
     lua_pushstring(L, "[]");
@@ -106,8 +110,8 @@ static int tostring(lua_State *L) {
 }
 
 static int eq(lua_State *L) {
-  Bytes *x = (Bytes *)luaL_checkudata(L, 1, "toolbox.bytes");
-  Bytes *y = (Bytes *)luaL_checkudata(L, 2, "toolbox.bytes");
+  Bytes *x = checkbytes(L, 1);
+  Bytes *y = checkbytes(L, 2);
 
   if (x->size != y->size) {
     lua_pushboolean(L, FALSE);
@@ -131,7 +135,7 @@ static const struct luaL_Reg byteslib_m[] = {
 };
 
 int luaopen_toolbox_bytes(lua_State *L) {
-  luaL_newmetatable(L, "toolbox.bytes");
+  luaL_newmetatable(L, BYTES_METATABLE_HANDLE);
 
   lua_pushvalue(L, -1);
   lua_setfield(L, -2, "__index");
