@@ -1,3 +1,4 @@
+#include <string.h>
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -29,12 +30,35 @@ static int newbytessized(lua_State *L, size_t size) {
   return 1;
 }
 
+static int newbytesstring(lua_State *L, const char *s, size_t l) {
+  Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes) + l * sizeof(char));
+  b->size = l;
+  b->data = (char *)(b + 1);
+
+  memcpy((void *)b->data, (void *)s, sizeof(char) * l);
+
+  luaL_getmetatable(L, "toolbox.bytes");
+  lua_setmetatable(L, -2);
+
+  return 1;
+}
+
 static int newbytes(lua_State *L) {
-  if (lua_gettop(L) > 0) {
+  if (lua_gettop(L) == 0) {
+    return newbytesempty(L);
+  }
+
+  if (lua_isinteger(L, 1)) {
     return newbytessized(L, luaL_checkinteger(L, 1));
   }
 
-  return newbytesempty(L);
+  if (lua_isstring(L, 1)) {
+    size_t l;
+    const char *s = luaL_checklstring(L, 1, &l);
+    return newbytesstring(L, s, l);
+  }
+
+  luaL_argerror(L, 1, "expected `string` or `number`");
 }
 
 static int getsize(lua_State *L) {

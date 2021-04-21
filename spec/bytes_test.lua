@@ -15,6 +15,12 @@ describe("bytes", function()
     end)
   end)
 
+  describe('when initialised with a string', function()
+    it('creates a byte array with the string length', function()
+      assert.are.equal(5, #bytes.new('hello'))
+    end)
+  end)
+
   it('supports __tostring', function()
     assert.are.equal('bytes(17)', string.format('%s', bytes.new(17)))
   end)
