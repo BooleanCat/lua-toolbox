@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -71,7 +72,30 @@ static int getsize(lua_State *L) {
 static int tostring(lua_State *L) {
   Bytes *b = (Bytes *)luaL_checkudata(L, 1, "toolbox.bytes");
 
-  lua_pushfstring(L, "bytes(%d)", b->size);
+  luaL_Buffer buffer;
+
+  // Number of characters to write
+  size_t size = sizeof(char) * (2 + (b->size > 1 ? 3 * b->size - 1 : 0));
+
+  luaL_buffinitsize(L, &buffer, size);
+  luaL_addchar(&buffer, '[');
+
+  char *addr = luaL_prepbuffsize(&buffer, size - 2);
+
+  if (b->size > 0) {
+    sprintf(addr, "%X", b->data[0]);
+    addr += 2;
+  }
+
+  for (size_t i = 1; i < b->size; i++) {
+    sprintf(addr, " %X", b->data[i]);
+    addr += 3;
+  }
+
+  luaL_addsize(&buffer, size - 2);
+  luaL_addchar(&buffer, ']');
+
+  luaL_pushresult(&buffer);
 
   return 1;
 }

@@ -22,7 +22,7 @@ describe("bytes", function()
   end)
 
   it('supports __tostring', function()
-    assert.are.equal('bytes(17)', string.format('%s', bytes.new(17)))
+    assert.are.equal('[68 65 6C 6C 6F]', string.format('%s', bytes.new('hello')))
   end)
 
   it('supports __eq', function()
