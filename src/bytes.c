@@ -4,6 +4,9 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
+#define FALSE 0
+#define TRUE  1
+
 typedef struct Bytes {
   int size;
   char *data;
@@ -24,6 +27,8 @@ static int newbytessized(lua_State *L, size_t size) {
   Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes) + size * sizeof(char));
   b->size = size;
   b->data = (char *)(b + 1);
+
+  memset(b->data, 0, sizeof(char) * b->size);
 
   luaL_getmetatable(L, "toolbox.bytes");
   lua_setmetatable(L, -2);
@@ -83,12 +88,12 @@ static int tostring(lua_State *L) {
   char *addr = luaL_prepbuffsize(&buffer, size - 2);
 
   if (b->size > 0) {
-    sprintf(addr, "%X", b->data[0]);
+    sprintf(addr, "%02X", b->data[0]);
     addr += 2;
   }
 
   for (size_t i = 1; i < b->size; i++) {
-    sprintf(addr, " %X", b->data[i]);
+    sprintf(addr, " %02X", b->data[i]);
     addr += 3;
   }
 
@@ -102,10 +107,10 @@ static int tostring(lua_State *L) {
 
 static int eq(lua_State *L) {
   Bytes *x = (Bytes *)luaL_checkudata(L, 1, "toolbox.bytes");
-  Bytes *y = (Bytes *)luaL_checkudata(L, 1, "toolbox.bytes");
+  Bytes *y = (Bytes *)luaL_checkudata(L, 2, "toolbox.bytes");
 
   if (x->size != y->size) {
-    lua_pushboolean(L, 0);
+    lua_pushboolean(L, FALSE);
     return 1;
   }
 
