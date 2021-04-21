@@ -77,23 +77,23 @@ static int getsize(lua_State *L) {
 static int tostring(lua_State *L) {
   Bytes *b = (Bytes *)luaL_checkudata(L, 1, "toolbox.bytes");
 
+  if (b->size == 0) {
+    lua_pushstring(L, "[]");
+    return 1;
+  }
+
   luaL_Buffer buffer;
 
   // Number of characters to write
-  size_t size = sizeof(char) * (2 + (b->size > 1 ? 3 * b->size - 1 : 0));
+  size_t size = sizeof(char) * (2 + 3 * b->size - 1);
 
   luaL_buffinitsize(L, &buffer, size);
   luaL_addchar(&buffer, '[');
 
-  char *addr = luaL_prepbuffsize(&buffer, size - 2);
+  char *addr = luaL_prepbuffsize(&buffer, size - 1);
 
-  if (b->size > 0) {
-    sprintf(addr, "%02X", b->data[0]);
-    addr += 2;
-  }
-
-  for (size_t i = 1; i < b->size; i++) {
-    sprintf(addr, " %02X", b->data[i]);
+  for (size_t i = 0; i < b->size; i++) {
+    sprintf(addr, "%02X ", b->data[i]);
     addr += 3;
   }
 
