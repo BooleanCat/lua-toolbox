@@ -14,4 +14,8 @@ describe("bytes", function()
       assert.are.equal(10, #bytes.new(10))
     end)
   end)
+
+  it('supports __tostring', function()
+    assert.are.equal('bytes(17)', string.format('%s', bytes.new(17)))
+  end)
 end)
