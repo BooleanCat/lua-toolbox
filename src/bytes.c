@@ -76,6 +76,19 @@ static int tostring(lua_State *L) {
   return 1;
 }
 
+static int eq(lua_State *L) {
+  Bytes *x = (Bytes *)luaL_checkudata(L, 1, "toolbox.bytes");
+  Bytes *y = (Bytes *)luaL_checkudata(L, 1, "toolbox.bytes");
+
+  if (x->size != y->size) {
+    lua_pushboolean(L, 0);
+    return 1;
+  }
+
+  lua_pushboolean(L, memcmp(x->data, y->data, sizeof(char) * x->size) == 0);
+  return 1;
+}
+
 static const struct luaL_Reg byteslib_f[] = {
   {"new", newbytes},
   {NULL, NULL}
@@ -84,6 +97,7 @@ static const struct luaL_Reg byteslib_f[] = {
 static const struct luaL_Reg byteslib_m[] = {
   {"__tostring", tostring},
   {"__len", getsize},
+  {"__eq", eq},
   {NULL, NULL}
 };
 
