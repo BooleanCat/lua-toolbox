@@ -2,13 +2,13 @@ local bytes = require('toolbox.bytes')
 
 local when = describe
 
-describe("bytes", function()
+describe('bytes', function()
   describe('new', function()
     it('creates a byte array', function()
       assert.is_not_nil(bytes.new())
     end)
 
-    it("has initial length 0", function()
+    it('has initial length 0', function()
       assert.are.equal(0, #bytes.new())
     end)
 
@@ -56,6 +56,52 @@ describe("bytes", function()
 
     it('prints length one byte arrays', function()
       assert.are.equal('[68]', string.format('%s', bytes.new('h')))
+    end)
+  end)
+
+  describe('concat', function()
+    it('concatenates two byte arrays', function()
+      local b = bytes.new('abc') .. bytes.new('de')
+      assert.are.equal(
+        '[61 62 63 64 65]',
+        string.format('%s', b)
+      )
+    end)
+
+    it('does not modify the originals', function()
+      local a = bytes.new('a')
+      local b = bytes.new('b')
+      local _ = a .. b
+
+      assert.are.equal('[61]', string.format('%s', a))
+      assert.are.equal('[62]', string.format('%s', b))
+    end)
+
+    when('the first array is empty', function()
+      it('concatenates the arrays', function()
+        local b = bytes.new() .. bytes.new('de')
+        assert.are.equal(
+          '[64 65]',
+          string.format('%s', b)
+        )
+      end)
+    end)
+
+    when('the second array is empty', function()
+      it('concatenates the arrays', function()
+        local b = bytes.new('abc') .. bytes.new()
+        assert.are.equal(
+          '[61 62 63]',
+          string.format('%s', b)
+        )
+      end)
+    end)
+
+    when('both arrays are empty', function()
+      it('concatenates the arrays', function()
+        local b = bytes.new() .. bytes.new()
+        assert.are.equal(#b, 0)
+      end)
     end)
   end)
 end)

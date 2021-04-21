@@ -122,6 +122,37 @@ static int eq(lua_State *L) {
   return 1;
 }
 
+static int concat(lua_State *L) {
+  Bytes *x = checkbytes(L, 1);
+  Bytes *y = checkbytes(L, 2);
+
+  size_t size = x->size + y->size;
+
+  Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes) + size * sizeof(char));
+  b->size = size;
+
+  if (size == 0) {
+    b->data = NULL;
+  } else {
+    b->data = (char *)(b + 1);
+    memcpy(
+      (void *)b->data,
+      (void *)x->data,
+      sizeof(char) * x->size
+    );
+    memcpy(
+      (void *)(b->data + x->size),
+      (void *)y->data,
+      sizeof(char) * y->size
+    );
+  }
+
+  luaL_getmetatable(L, BYTES_METATABLE_HANDLE);
+  lua_setmetatable(L, -2);
+
+  return 1;
+}
+
 static const struct luaL_Reg byteslib_f[] = {
   {"new", newbytes},
   {NULL, NULL}
@@ -131,6 +162,7 @@ static const struct luaL_Reg byteslib_m[] = {
   {"__tostring", tostring},
   {"__len", getsize},
   {"__eq", eq},
+  {"__concat", concat},
   {NULL, NULL}
 };
 
