@@ -4,8 +4,20 @@ jobs:
   plan:
   - get: lua-toolbox
     trigger: true
-  - task: hello
-    file: lua-toolbox/ci/tasks/hello.yml
+  - task: test
+    config:
+      inputs:
+      - name: lua-toolbox
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: {repository: booleancat/lua-toolbox-ci}
+      run:
+        dir: lua-toolbox
+        path: sh
+        args:
+        - -exc
+        - luarocks build; make test 
 
 resources:
 - name: lua-toolbox
