@@ -1,0 +1,15 @@
+jobs:
+- name: test
+  public: true
+  plan:
+  - get: lua-toolbox
+    trigger: true
+  - task: hello
+    file: lua-toolbox/ci/tasks/hello.yml
+
+resources:
+- name: lua-toolbox
+  type: git
+  icon: git
+  source:
+    uri: https://github.com/BooleanCat/lua-toolbox.git
