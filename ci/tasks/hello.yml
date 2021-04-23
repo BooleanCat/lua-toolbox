@@ -2,7 +2,8 @@ platform: linux
 
 image_resource:
   type: registry-image
-  source: {respository: "booleancat/lua-toolbox-ci"}
+  source:
+    repository: booleancat/lua-toolbox-ci
 
 inputs:
 - name: lua-toolbox
