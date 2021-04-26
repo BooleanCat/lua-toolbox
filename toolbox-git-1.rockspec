@@ -1,27 +1,28 @@
-package = "toolbox"
+package = 'toolbox'
 
-version = "git-1"
+version = 'git-1'
 
 source = {
-  url = "git://github.com/BooleanCat/lua-toolbox"
+  url = 'git://github.com/BooleanCat/lua-toolbox'
 }
 
 description = {
-  summary = "",
-  detailed = "",
-  homepage = "",
-  license = ""
+  summary = '',
+  detailed = '',
+  homepage = '',
+  license = ''
 }
 
 dependencies = {
-  "lua == 5.4",
+  'lua == 5.4',
 }
 
 build = {
-  type = "builtin",
+  type = 'builtin',
   modules = {
-    ['toolbox.bytes'] = {
-      sources = {"src/bytes.c"}
+    ['toolbox.types'] = {
+      sources = {'src/lib/types.c'},
+      incdirs = {'src/include'}
     }
   }
 }

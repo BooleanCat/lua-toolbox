@@ -1,20 +1,10 @@
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
-
-#define FALSE 0
-#define TRUE  1
-
-const char *BYTES_METATABLE_HANDLE = "toolbox.bytes";
-
-#define checkbytes(L, i) (Bytes *)luaL_checkudata(L, i, BYTES_METATABLE_HANDLE)
-
-typedef struct Bytes {
-  int size;
-  char *data;
-} Bytes;
+#include "types.h"
 
 static int newbytesempty(lua_State *L) {
   Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes));
@@ -114,7 +104,7 @@ static int eq(lua_State *L) {
   Bytes *y = checkbytes(L, 2);
 
   if (x->size != y->size) {
-    lua_pushboolean(L, FALSE);
+    lua_pushboolean(L, false);
     return 1;
   }
 
@@ -154,7 +144,7 @@ static int concat(lua_State *L) {
 }
 
 static const struct luaL_Reg byteslib_f[] = {
-  {"new", newbytes},
+  {"bytes", newbytes},
   {NULL, NULL}
 };
 
@@ -166,7 +156,7 @@ static const struct luaL_Reg byteslib_m[] = {
   {NULL, NULL}
 };
 
-int luaopen_toolbox_bytes(lua_State *L) {
+int luaopen_toolbox_types(lua_State *L) {
   luaL_newmetatable(L, BYTES_METATABLE_HANDLE);
 
   lua_pushvalue(L, -1);
