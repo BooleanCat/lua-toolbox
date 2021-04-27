@@ -58,7 +58,7 @@ static int newbytes(lua_State *L) {
     return newbytesstring(L, s, l);
   }
 
-  luaL_argerror(L, 1, "expected `string` or `number`");
+  luaL_argexpected(L, false, 1, "string or integer");
 }
 
 static int getsize(lua_State *L) {

@@ -30,6 +30,15 @@ describe('types', function()
         assert.are.equal(5, #types.bytes('hello'))
       end)
     end)
+
+    when('initialised with an invalid type', function()
+      it('fails', function()
+        assert.has_error(
+          function() types.bytes({}) end,
+          "bad argument #1 to 'bytes' (string or integer expected, got table)"
+        )
+      end)
+    end)
   end)
 
   describe('__eq', function()
