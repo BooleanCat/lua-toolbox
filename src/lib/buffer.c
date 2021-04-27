@@ -43,7 +43,7 @@ static int new(lua_State *L) {
   return newfrombytes(L);
 }
 
-static int getsize(lua_State *L) {
+static int __len(lua_State *L) {
   Buffer *b = checkbuffer(L, 1);
   lua_pushinteger(L, b->size);
   return 1;
@@ -70,7 +70,7 @@ static const struct luaL_Reg bufferlib_f[] = {
 };
 
 static const struct luaL_Reg bufferlib_m[] = {
-  {"__len", getsize},
+  {"__len", __len},
   {"bytes", bytes},
   {NULL, NULL}
 };

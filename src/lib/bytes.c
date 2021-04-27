@@ -61,13 +61,13 @@ static int new(lua_State *L) {
   luaL_argexpected(L, false, 1, "string or integer");
 }
 
-static int getsize(lua_State *L) {
+static int __len(lua_State *L) {
   Bytes *b = checkbytes(L, 1);
   lua_pushinteger(L, b->size);
   return 1;
 }
 
-static int tostring(lua_State *L) {
+static int __tostring(lua_State *L) {
   Bytes *b = checkbytes(L, 1);
 
   if (b->size == 0) {
@@ -98,7 +98,7 @@ static int tostring(lua_State *L) {
   return 1;
 }
 
-static int eq(lua_State *L) {
+static int __eq(lua_State *L) {
   Bytes *x = checkbytes(L, 1);
   Bytes *y = checkbytes(L, 2);
 
@@ -111,7 +111,7 @@ static int eq(lua_State *L) {
   return 1;
 }
 
-static int concat(lua_State *L) {
+static int __concat(lua_State *L) {
   Bytes *x = checkbytes(L, 1);
   Bytes *y = checkbytes(L, 2);
 
@@ -148,10 +148,10 @@ static const struct luaL_Reg byteslib_f[] = {
 };
 
 static const struct luaL_Reg byteslib_m[] = {
-  {"__tostring", tostring},
-  {"__len", getsize},
-  {"__eq", eq},
-  {"__concat", concat},
+  {"__tostring", __tostring},
+  {"__len", __len},
+  {"__eq", __eq},
+  {"__concat", __concat},
   {NULL, NULL}
 };
 
