@@ -1,12 +1,19 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include "bytes.h"
+#include "types.h"
 
 static int newbuffer(lua_State *L) {
-  Buffer *b = (Buffer *)lua_newuserdata(L, sizeof(Buffer));
+  if (lua_gettop(L) == 0) {
+    Buffer *b = (Buffer *)lua_newuserdata(L, sizeof(Buffer));
 
-  luaL_getmetatable(L, BUFFER_METATABLE_HANDLE);
-  lua_setmetatable(L, -2);
+    luaL_getmetatable(L, BUFFER_METATABLE_HANDLE);
+    lua_setmetatable(L, -2);
+
+    return 1;
+  }
+
+  Bytes *b = checkbytes(L, 1);
 
   return 1;
 }
