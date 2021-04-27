@@ -64,7 +64,7 @@ static int __tbread(lua_State *L) {
 
   int size = MIN(buf->size - buf->cursor, b->size);
 
-  memcpy((void *)b->data, (void *)(buf->data + buf->cursor), size);
+  memcpy((void *)b->data, (void *)(buf->data + buf->cursor), size * sizeof(char));
   buf->cursor += size;
 
   lua_pushinteger(L, size);
