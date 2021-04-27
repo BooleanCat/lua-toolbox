@@ -1,6 +1,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "buffer.h"
 #include "bytes.h"
 
@@ -67,8 +68,12 @@ static int __tbread(lua_State *L) {
   buf->cursor += size;
 
   lua_pushinteger(L, size);
+  if (buf->cursor < buf->size) {
+    return 1;
+  }
 
-  return 1;
+  lua_pushboolean(L, true);
+  return 2;
 }
 
 static int bytes(lua_State *L) {
