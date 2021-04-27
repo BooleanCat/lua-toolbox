@@ -143,7 +143,7 @@ static int concat(lua_State *L) {
   return 1;
 }
 
-static const struct luaL_Reg byteslib_f[] = {
+static const struct luaL_Reg typeslib_f[] = {
   {"bytes", newbytes},
   {NULL, NULL}
 };
@@ -163,7 +163,7 @@ int luaopen_toolbox_types(lua_State *L) {
   lua_setfield(L, -2, "__index");
 
   luaL_setfuncs(L, byteslib_m, 0);
-  luaL_newlib(L, byteslib_f);
+  luaL_newlib(L, typeslib_f);
 
   return 1;
 }
