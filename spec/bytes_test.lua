@@ -28,4 +28,13 @@ describe('bytes', function()
       end)
     end)
   end)
+
+  describe('bytes', function()
+    it('returns a copy of the buffer contents', function()
+      assert.are.equal(
+        types.bytes('foo'),
+        bytes.buffer(types.bytes('foo')):bytes()
+      )
+    end)
+  end)
 end)
