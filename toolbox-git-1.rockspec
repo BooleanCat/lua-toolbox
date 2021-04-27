@@ -23,6 +23,10 @@ build = {
     ['toolbox.types'] = {
       sources = {'src/lib/types.c'},
       incdirs = {'src/include'}
+    },
+    ['toolbox.bytes'] = {
+      sources = {'src/lib/bytes.c'},
+      incdirs = {'src/include'}
     }
   }
 }

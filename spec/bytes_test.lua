@@ -1,4 +1,5 @@
 local types = require('toolbox.types')
+local bytes = require('toolbox.bytes')
 
 local when = describe
 
