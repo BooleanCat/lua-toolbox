@@ -1,13 +1,13 @@
-#ifndef TOOLBOX_BYTES_H
-#define TOOLBOX_BYTES_H
+#ifndef TOOLBOX_TYPE_H
+#define TOOLBOX_TYPE_H
 
-const char *BUFFER_METATABLE_HANDLE = "toolbox.bytes.buffer";
+const char *BYTES_M_NAME = "toolbox.bytes";
 
-#define checkbuffer(L, i) (Buffer *)luaL_checkudata(L, i, BUFFER_METATABLE_HANDLE)
+#define checkbytes(L, i) (Bytes *)luaL_checkudata(L, i, BYTES_M_NAME)
 
-typedef struct Buffer {
+typedef struct Bytes {
   int size;
   char *data;
-} Buffer;
+} Bytes;
 
 #endif

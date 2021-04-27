@@ -1,87 +1,167 @@
+#include <string.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
-#include <string.h>
 #include "bytes.h"
-#include "types.h"
 
-static int newbufferempty(lua_State *L) {
-  Buffer *b = (Buffer *)lua_newuserdata(L, sizeof(Buffer));
-
+static int newempty(lua_State *L) {
+  Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes));
   b->size = 0;
   b->data = NULL;
 
-  luaL_getmetatable(L, BUFFER_METATABLE_HANDLE);
+  luaL_getmetatable(L, BYTES_M_NAME);
   lua_setmetatable(L, -2);
 
   return 1;
 }
 
-static int newbufferfrombytes(lua_State *L) {
-  Bytes *b = checkbytes(L, 1);
+static int newsized(lua_State *L, size_t size) {
+  Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes) + size * sizeof(char));
+  b->size = size;
+  b->data = (char *)(b + 1);
 
-  Buffer *buf = (Buffer *)lua_newuserdata(L, sizeof(Buffer) + b->size * sizeof(char));
+  memset(b->data, 0, sizeof(char) * b->size);
 
-  buf->size = b->size;
-  if (buf->size == 0) {
-    buf->data = NULL;
-  } else {
-    buf->data = (char *)(b + 1);
-    memcpy((void *)buf->data, (void *)b->data, sizeof(char) * buf->size);
-  }
-
-  luaL_getmetatable(L, BUFFER_METATABLE_HANDLE);
+  luaL_getmetatable(L, BYTES_M_NAME);
   lua_setmetatable(L, -2);
 
   return 1;
 }
 
-static int newbuffer(lua_State *L) {
+static int newstring(lua_State *L, const char *s, size_t l) {
+  Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes) + l * sizeof(char));
+  b->size = l;
+  b->data = (char *)(b + 1);
+
+  memcpy((void *)b->data, (void *)s, sizeof(char) * l);
+
+  luaL_getmetatable(L, BYTES_M_NAME);
+  lua_setmetatable(L, -2);
+
+  return 1;
+}
+
+static int new(lua_State *L) {
   if (lua_gettop(L) == 0) {
-    return newbufferempty(L);
+    return newempty(L);
   }
 
-  return newbufferfrombytes(L);
+  if (lua_isinteger(L, 1)) {
+    return newsized(L, luaL_checkinteger(L, 1));
+  }
+
+  if (lua_isstring(L, 1)) {
+    size_t l;
+    const char *s = luaL_checklstring(L, 1, &l);
+    return newstring(L, s, l);
+  }
+
+  luaL_argexpected(L, false, 1, "string or integer");
 }
 
 static int getsize(lua_State *L) {
-  Buffer *b = checkbuffer(L, 1);
+  Bytes *b = checkbytes(L, 1);
   lua_pushinteger(L, b->size);
   return 1;
 }
 
-static int bytes(lua_State *L) {
-  Buffer *buf = checkbuffer(L, 1);
+static int tostring(lua_State *L) {
+  Bytes *b = checkbytes(L, 1);
 
-  Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes) + buf->size * sizeof(char));
-  b->size = buf->size;
-  b->data = (char *)(b + 1);
+  if (b->size == 0) {
+    lua_pushstring(L, "[]");
+    return 1;
+  }
 
-  memcpy((void *)b->data, (void *)buf->data, sizeof(char) * buf->size);
+  luaL_Buffer buffer;
 
-  luaL_getmetatable(L, BYTES_METATABLE_HANDLE);
+  // Number of characters to write
+  size_t size = sizeof(char) * (2 + 3 * b->size - 1);
+
+  luaL_buffinitsize(L, &buffer, size);
+  luaL_addchar(&buffer, '[');
+
+  char *addr = luaL_prepbuffsize(&buffer, size - 1);
+
+  for (size_t i = 0; i < b->size; i++) {
+    sprintf(addr, "%02X ", b->data[i]);
+    addr += 3;
+  }
+
+  luaL_addsize(&buffer, size - 2);
+  luaL_addchar(&buffer, ']');
+
+  luaL_pushresult(&buffer);
+
+  return 1;
+}
+
+static int eq(lua_State *L) {
+  Bytes *x = checkbytes(L, 1);
+  Bytes *y = checkbytes(L, 2);
+
+  if (x->size != y->size) {
+    lua_pushboolean(L, false);
+    return 1;
+  }
+
+  lua_pushboolean(L, memcmp(x->data, y->data, sizeof(char) * x->size) == 0);
+  return 1;
+}
+
+static int concat(lua_State *L) {
+  Bytes *x = checkbytes(L, 1);
+  Bytes *y = checkbytes(L, 2);
+
+  size_t size = x->size + y->size;
+
+  Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes) + size * sizeof(char));
+  b->size = size;
+
+  if (size == 0) {
+    b->data = NULL;
+  } else {
+    b->data = (char *)(b + 1);
+    memcpy(
+      (void *)b->data,
+      (void *)x->data,
+      sizeof(char) * x->size
+    );
+    memcpy(
+      (void *)(b->data + x->size),
+      (void *)y->data,
+      sizeof(char) * y->size
+    );
+  }
+
+  luaL_getmetatable(L, BYTES_M_NAME);
   lua_setmetatable(L, -2);
 
   return 1;
 }
 
 static const struct luaL_Reg byteslib_f[] = {
-  {"buffer", newbuffer},
+  {"new", new},
   {NULL, NULL}
 };
 
-static const struct luaL_Reg bufferlib_m[] = {
+static const struct luaL_Reg byteslib_m[] = {
+  {"__tostring", tostring},
   {"__len", getsize},
-  {"bytes", bytes},
+  {"__eq", eq},
+  {"__concat", concat},
   {NULL, NULL}
 };
 
 int luaopen_toolbox_bytes(lua_State *L) {
-  luaL_newmetatable(L, BUFFER_METATABLE_HANDLE);
+  luaL_newmetatable(L, BYTES_M_NAME);
 
   lua_pushvalue(L, -1);
   lua_setfield(L, -2, "__index");
 
-  luaL_setfuncs(L, bufferlib_m, 0);
+  luaL_setfuncs(L, byteslib_m, 0);
   luaL_newlib(L, byteslib_f);
 
   return 1;
