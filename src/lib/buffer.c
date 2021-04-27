@@ -49,6 +49,12 @@ static int __len(lua_State *L) {
   return 1;
 }
 
+static int __tostring(lua_State *L) {
+  Buffer *b = checkbuffer(L, 1);
+  lua_pushfstring(L, "%s[%d]", BUFFER_M_NAME, b->size);
+  return 1;
+}
+
 static int bytes(lua_State *L) {
   Buffer *buf = checkbuffer(L, 1);
 
@@ -71,6 +77,7 @@ static const struct luaL_Reg bufferlib_f[] = {
 
 static const struct luaL_Reg bufferlib_m[] = {
   {"__len", __len},
+  {"__tostring", __tostring},
   {"bytes", bytes},
   {NULL, NULL}
 };

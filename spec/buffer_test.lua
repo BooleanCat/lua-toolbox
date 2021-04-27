@@ -37,4 +37,13 @@ describe('buffer', function()
       )
     end)
   end)
+
+  describe('__tostring', function()
+    it('represents the buffer size', function()
+      assert.are.equal(
+        'toolbox.buffer[5]',
+        string.format('%s', buffer.new(bytes.new('hello')))
+      )
+    end)
+  end)
 end)
