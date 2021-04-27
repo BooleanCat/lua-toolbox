@@ -8,6 +8,7 @@ static int newempty(lua_State *L) {
   Buffer *b = (Buffer *)lua_newuserdata(L, sizeof(Buffer));
 
   b->size = 0;
+  b->cursor = 0;
   b->data = NULL;
 
   luaL_getmetatable(L, BUFFER_M_NAME);
@@ -22,6 +23,7 @@ static int newfrombytes(lua_State *L) {
   Buffer *buf = (Buffer *)lua_newuserdata(L, sizeof(Buffer) + b->size * sizeof(char));
 
   buf->size = b->size;
+  buf->cursor = 0;
   if (buf->size == 0) {
     buf->data = NULL;
   } else {
@@ -55,6 +57,20 @@ static int __tostring(lua_State *L) {
   return 1;
 }
 
+static int __tbread(lua_State *L) {
+  Buffer *buf = checkbuffer(L, 1);
+  Bytes *b = checkbytes(L, 2);
+
+  int size = MIN(buf->size - buf->cursor, b->size);
+
+  memcpy((void *)b->data, (void *)(buf->data + buf->cursor), size);
+  buf->cursor += size;
+
+  lua_pushinteger(L, size);
+
+  return 1;
+}
+
 static int bytes(lua_State *L) {
   Buffer *buf = checkbuffer(L, 1);
 
@@ -78,6 +94,7 @@ static const struct luaL_Reg bufferlib_f[] = {
 static const struct luaL_Reg bufferlib_m[] = {
   {"__len", __len},
   {"__tostring", __tostring},
+  {"__tbread", __tbread},
   {"bytes", bytes},
   {NULL, NULL}
 };
