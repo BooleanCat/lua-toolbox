@@ -1,4 +1,5 @@
 local bytes = require('toolbox.bytes')
+local types = require('toolbox.types')
 
 local when = describe
 
@@ -12,7 +13,13 @@ describe('bytes', function()
       assert.are.equal(0, #bytes.buffer())
     end)
 
-    when('called with something other than a byte slice', function()
+    when('initialised with a toolbox.types.bytes', function()
+      it('has initial length of the argument', function()
+        assert.are.equal(3, #bytes.buffer(types.bytes('foo')))
+      end)
+    end)
+
+    when('called with something other than a toolbox.types.bytes', function()
       it('returns an error', function()
         assert.has_error(
           function() bytes.buffer('foo') end,

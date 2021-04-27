@@ -63,7 +63,6 @@ static int newbytes(lua_State *L) {
 
 static int getsize(lua_State *L) {
   Bytes *b = checkbytes(L, 1);
-  luaL_argcheck(L, b != NULL, 1, "`bytes` expected");
   lua_pushinteger(L, b->size);
   return 1;
 }
