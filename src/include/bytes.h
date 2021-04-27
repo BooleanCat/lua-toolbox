@@ -1,0 +1,10 @@
+#ifndef TOOLBOX_BYTES_H
+#define TOOLBOX_BYTES_H
+
+const char *BUFFER_METATABLE_HANDLE = "toolbox.types.bytes";
+
+#define checkbuffer(L, i) (Buffer *)luaL_checkudata(L, i, BUFFER_METATABLE_HANDLE)
+
+typedef struct Buffer {} Buffer;
+
+#endif
