@@ -109,6 +109,17 @@ describe('buffer', function()
         assert.are.equal(bytes.new('lol'), b)
       end)
     end)
+
+    when('pass the wrong type of argument', function()
+      it('raises an error', function()
+        local buf = buffer.new(bytes.new('hello'))
+
+        assert.has_error(
+          function() buf:__tbread({}) end,
+          "bad argument #1 to '__tbread' (toolbox.bytes expected, got table)"
+        )
+      end)
+    end)
   end)
 
   describe('__tbwrite', function()
