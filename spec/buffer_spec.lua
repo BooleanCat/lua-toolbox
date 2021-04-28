@@ -98,12 +98,12 @@ describe('buffer', function()
         assert.is_nil(done)
         assert.are.equal(bytes.new('hel'), b)
 
-        local n, done = buf:__tbread(b)
+        n, done = buf:__tbread(b)
         assert.are.equal(2, n)
         assert.is_true(done)
         assert.are.equal(bytes.new('lol'), b)
 
-        local n, done = buf:__tbread(b)
+        n, done = buf:__tbread(b)
         assert.are.equal(0, n)
         assert.is_true(done)
         assert.are.equal(bytes.new('lol'), b)
@@ -124,8 +124,8 @@ describe('buffer', function()
 
   describe('__tbwrite', function()
     it('reads bytes from a toolbox.bytes into the buffer', function()
-      local b = bytes.new('hello')
-      local buf = buffer.new()
+      local _ = bytes.new('hello')
+      local _ = buffer.new()
 
       -- TODO: implement
       -- n, err = buf.__tbwrite(b)
