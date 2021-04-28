@@ -4,7 +4,7 @@ build:
 	luarocks make
 
 test:
-	busted --shuffle-tests spec/*
+	busted --shuffle-tests spec/
 
 check:
 	luacheck ./
