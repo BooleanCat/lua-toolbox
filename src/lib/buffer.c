@@ -137,6 +137,7 @@ static const struct luaL_Reg bufferlib_m[] = {
   {"__gc", __gc},
   {"__tbread", __tbread},
   {"__tbwrite", __tbwrite},
+  // TODO: separate read and write pointers
   {"bytes", bytes},
   {"reset", reset},
   {NULL, NULL}
