@@ -2,16 +2,17 @@
 #include <lauxlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "buffer.h"
 #include "bytes.h"
 
 static int newempty(lua_State *L) {
-  Buffer *b = (Buffer *)lua_newuserdata(L, sizeof(Buffer) + BUFFER_MIN_CAPACITY * sizeof(char));
+  Buffer *b = (Buffer *)lua_newuserdata(L, sizeof(Buffer));
 
   b->size = 0;
   b->cursor = 0;
   b->capacity = BUFFER_MIN_CAPACITY;
-  b->data = (char *)(b + 1);
+  b->data = (char *)malloc(sizeof(char) * BUFFER_MIN_CAPACITY);
 
   luaL_getmetatable(L, BUFFER_M_NAME);
   lua_setmetatable(L, -2);
@@ -24,12 +25,12 @@ static int newfrombytes(lua_State *L) {
 
   int capacity = MAX(BUFFER_MIN_CAPACITY, b->size);
 
-  Buffer *buf = (Buffer *)lua_newuserdata(L, sizeof(Buffer) + capacity * sizeof(char));
+  Buffer *buf = (Buffer *)lua_newuserdata(L, sizeof(Buffer));
 
   buf->size = b->size;
   buf->capacity = capacity;
   buf->cursor = 0;
-  buf->data = (char *)(b + 1);
+  buf->data = (char *)malloc(sizeof(char) * capacity);
   memcpy((void *)buf->data, (void *)b->data, sizeof(char) * buf->size);
 
   luaL_getmetatable(L, BUFFER_M_NAME);
@@ -58,6 +59,13 @@ static int __tostring(lua_State *L) {
   return 1;
 }
 
+static int __gc(lua_State *L) {
+  Buffer *b = checkbuffer(L, 1);
+  free(b->data);
+  b->data = NULL;
+  return 0;
+}
+
 static int __tbread(lua_State *L) {
   Buffer *buf = checkbuffer(L, 1);
   Bytes *b = checkbytes(L, 2);
@@ -79,6 +87,10 @@ static int __tbread(lua_State *L) {
 static int __tbwrite(lua_State *L) {
   Buffer *buf = checkbuffer(L, 1);
   Bytes *b = checkbytes(L, 2);
+
+  if (buf->capacity - buf->size < b->size) {
+    buf->data = (char *)realloc((void *)buf->data, sizeof(char) * (buf->capacity + b->size + BUFFER_MIN_CAPACITY));
+  }
 
   memcpy(buf->data + buf->size, b->data, b->size);
   buf->size += b->size;
@@ -111,6 +123,7 @@ static const struct luaL_Reg bufferlib_f[] = {
 static const struct luaL_Reg bufferlib_m[] = {
   {"__len", __len},
   {"__tostring", __tostring},
+  {"__gc", __gc},
   {"__tbread", __tbread},
   {"__tbwrite", __tbwrite},
   {"bytes", bytes},
