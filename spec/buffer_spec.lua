@@ -165,4 +165,15 @@ describe('buffer', function()
       end)
     end)
   end)
+
+  describe('reset', function()
+    it('empties the buffer', function()
+      local buf = buffer.new(bytes.new('hello'))
+      assert.are.equal(bytes.new('hello'), buf:bytes())
+
+      buf:reset()
+
+      assert.are.equal(0, #buf:bytes())
+    end)
+  end)
 end)

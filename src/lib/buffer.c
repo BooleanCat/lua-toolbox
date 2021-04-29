@@ -90,6 +90,7 @@ static int __tbwrite(lua_State *L) {
 
   if (buf->capacity - buf->size < b->size) {
     buf->data = (char *)realloc((void *)buf->data, sizeof(char) * (buf->capacity + b->size + BUFFER_MIN_CAPACITY));
+    buf->capacity += b->size + BUFFER_MIN_CAPACITY;
   }
 
   memcpy(buf->data + buf->size, b->data, b->size);
@@ -115,6 +116,16 @@ static int bytes(lua_State *L) {
   return 1;
 }
 
+static int reset(lua_State *L) {
+  Buffer *buf = checkbuffer(L, 1);
+
+  buf->data = (char *)realloc((void *)buf->data, sizeof(char) * BUFFER_MIN_CAPACITY);
+  buf->capacity = BUFFER_MIN_CAPACITY;
+  buf->size = 0;
+
+  return 0;
+}
+
 static const struct luaL_Reg bufferlib_f[] = {
   {"new", new},
   {NULL, NULL}
@@ -127,6 +138,7 @@ static const struct luaL_Reg bufferlib_m[] = {
   {"__tbread", __tbread},
   {"__tbwrite", __tbwrite},
   {"bytes", bytes},
+  {"reset", reset},
   {NULL, NULL}
 };
 
