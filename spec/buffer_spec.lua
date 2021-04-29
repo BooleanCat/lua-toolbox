@@ -155,7 +155,7 @@ describe('buffer', function()
         local b = bytes.new('hello')
         local buf = buffer.new()
 
-        for i = 1, 20 do
+        for _ = 1, 20 do
           local n, err = buf:__tbwrite(b)
           assert.are.equal(5, n)
           assert.is_nil(err)
