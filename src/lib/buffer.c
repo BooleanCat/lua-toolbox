@@ -6,11 +6,12 @@
 #include "bytes.h"
 
 static int newempty(lua_State *L) {
-  Buffer *b = (Buffer *)lua_newuserdata(L, sizeof(Buffer));
+  Buffer *b = (Buffer *)lua_newuserdata(L, sizeof(Buffer) + BUFFER_MIN_CAPACITY * sizeof(char));
 
   b->size = 0;
   b->cursor = 0;
-  b->data = NULL;
+  b->capacity = BUFFER_MIN_CAPACITY;
+  b->data = (char *)(b + 1);
 
   luaL_getmetatable(L, BUFFER_M_NAME);
   lua_setmetatable(L, -2);
@@ -21,16 +22,15 @@ static int newempty(lua_State *L) {
 static int newfrombytes(lua_State *L) {
   Bytes *b = checkbytes(L, 1);
 
-  Buffer *buf = (Buffer *)lua_newuserdata(L, sizeof(Buffer) + b->size * sizeof(char));
+  int capacity = MAX(BUFFER_MIN_CAPACITY, b->size);
+
+  Buffer *buf = (Buffer *)lua_newuserdata(L, sizeof(Buffer) + capacity * sizeof(char));
 
   buf->size = b->size;
+  buf->capacity = capacity;
   buf->cursor = 0;
-  if (buf->size == 0) {
-    buf->data = NULL;
-  } else {
-    buf->data = (char *)(b + 1);
-    memcpy((void *)buf->data, (void *)b->data, sizeof(char) * buf->size);
-  }
+  buf->data = (char *)(b + 1);
+  memcpy((void *)buf->data, (void *)b->data, sizeof(char) * buf->size);
 
   luaL_getmetatable(L, BUFFER_M_NAME);
   lua_setmetatable(L, -2);
@@ -80,7 +80,10 @@ static int __tbwrite(lua_State *L) {
   Buffer *buf = checkbuffer(L, 1);
   Bytes *b = checkbytes(L, 2);
 
-  lua_pushinteger(L, 0);
+  memcpy(buf->data + buf->size, b->data, b->size);
+  buf->size += b->size;
+
+  lua_pushinteger(L, b->size);
 
   return 1;
 }
