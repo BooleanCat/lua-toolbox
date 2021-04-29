@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -18,9 +19,9 @@ static int newempty(lua_State *L) {
 }
 
 static int newsized(lua_State *L, size_t size) {
-  Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes) + size * sizeof(char));
+  Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes));
   b->size = size;
-  b->data = (char *)(b + 1);
+  b->data = (char *)malloc(sizeof(char) * size);
 
   memset(b->data, 0, sizeof(char) * b->size);
 
@@ -31,9 +32,9 @@ static int newsized(lua_State *L, size_t size) {
 }
 
 static int newstring(lua_State *L, const char *s, size_t l) {
-  Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes) + l * sizeof(char));
+  Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes));
   b->size = l;
-  b->data = (char *)(b + 1);
+  b->data = (char *)malloc(sizeof(char) * l);
 
   memcpy((void *)b->data, (void *)s, sizeof(char) * l);
 
@@ -117,29 +118,32 @@ static int __concat(lua_State *L) {
 
   size_t size = x->size + y->size;
 
-  Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes) + size * sizeof(char));
+  Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes));
   b->size = size;
 
-  if (size == 0) {
-    b->data = NULL;
-  } else {
-    b->data = (char *)(b + 1);
-    memcpy(
-      (void *)b->data,
-      (void *)x->data,
-      sizeof(char) * x->size
-    );
-    memcpy(
-      (void *)(b->data + x->size),
-      (void *)y->data,
-      sizeof(char) * y->size
-    );
-  }
+  b->data = (char *)malloc(sizeof(char) * size);
+  memcpy(
+    (void *)b->data,
+    (void *)x->data,
+    sizeof(char) * x->size
+  );
+  memcpy(
+    (void *)(b->data + x->size),
+    (void *)y->data,
+    sizeof(char) * y->size
+  );
 
   luaL_getmetatable(L, BYTES_M_NAME);
   lua_setmetatable(L, -2);
 
   return 1;
+}
+
+static int __gc(lua_State *L) {
+  Bytes *b = checkbytes(L, 1);
+  free((void *)b->data);
+  b->data = NULL;
+  return 0;
 }
 
 static const struct luaL_Reg byteslib_f[] = {
@@ -152,6 +156,7 @@ static const struct luaL_Reg byteslib_m[] = {
   {"__len", __len},
   {"__eq", __eq},
   {"__concat", __concat},
+  {"__gc", __gc},
   {NULL, NULL}
 };
 

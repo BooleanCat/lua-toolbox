@@ -103,9 +103,9 @@ static int __tbwrite(lua_State *L) {
 static int bytes(lua_State *L) {
   Buffer *buf = checkbuffer(L, 1);
 
-  Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes) + buf->size * sizeof(char));
+  Bytes *b = (Bytes *)lua_newuserdata(L, sizeof(Bytes));
   b->size = buf->size;
-  b->data = (char *)(b + 1);
+  b->data = (char *)malloc(sizeof(char) * buf->size);
 
   memcpy((void *)b->data, (void *)buf->data, sizeof(char) * buf->size);
 
