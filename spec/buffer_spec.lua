@@ -124,13 +124,13 @@ describe('buffer', function()
 
   describe('__tbwrite', function()
     it('reads bytes from a toolbox.bytes into the buffer', function()
-      local _ = bytes.new('hello')
-      local _ = buffer.new()
+      local b = bytes.new('hello')
+      local buf = buffer.new()
 
       -- TODO: implement
-      -- n, err = buf.__tbwrite(b)
+      local _, err = buf:__tbwrite(b)
       -- assert.are.equal(5, n)
-      -- assert.is_nil(err)
+      assert.is_nil(err)
       -- assert.are.equal(bytes.new('hello'), buf.bytes())
     end)
   end)

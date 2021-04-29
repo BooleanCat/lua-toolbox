@@ -76,6 +76,15 @@ static int __tbread(lua_State *L) {
   return 2;
 }
 
+static int __tbwrite(lua_State *L) {
+  Buffer *buf = checkbuffer(L, 1);
+  Bytes *b = checkbytes(L, 2);
+
+  lua_pushinteger(L, 0);
+
+  return 1;
+}
+
 static int bytes(lua_State *L) {
   Buffer *buf = checkbuffer(L, 1);
 
@@ -100,6 +109,7 @@ static const struct luaL_Reg bufferlib_m[] = {
   {"__len", __len},
   {"__tostring", __tostring},
   {"__tbread", __tbread},
+  {"__tbwrite", __tbwrite},
   {"bytes", bytes},
   {NULL, NULL}
 };
