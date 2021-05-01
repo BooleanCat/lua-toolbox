@@ -147,50 +147,12 @@ static int __gc(lua_State *L) {
   return 0;
 }
 
-static int slice(lua_State *L) {
-  Data *data = toolbox_checkdata(L, 1);
-  size_t offset = luaL_checkinteger(L, 2);
-  size_t size = luaL_checkinteger(L, 3);
-
-  DataSlice *s = (DataSlice *)lua_newuserdata(L, sizeof(DataSlice));
-  s->offset = offset;
-  s->size = size;
-
-  if (offset > data->size) {
-    s->offset = data-> size + 1;
-    s->size = 0;
-  }
-
-  luaL_getmetatable(L, DATASLICE_M_NAME);
-  lua_setmetatable(L, -2);
-
-  lua_insert(L, 1);
-  lua_settop(L, 2);
-
-  lua_setiuservalue(L, 1, 1);
-
-  return 1;
-}
-
 static const struct luaL_Reg datalib_m[] = {
   {"__eq", __eq},
   {"__tostring", __tostring},
   {"__len", data__len},
   {"__concat", __concat},
   {"__gc", __gc},
-  {"slice", slice},
-  {NULL, NULL}
-};
-
-static int dataslice__len(lua_State *L) {
-  DataSlice *s = toolbox_checkdataslice(L, 1);
-
-  lua_pushinteger(L, s->size);
-  return 1;
-}
-
-static const struct luaL_Reg dataslicelib_m[] = {
-  {"__len", dataslice__len},
   {NULL, NULL}
 };
 
@@ -201,13 +163,6 @@ int luaopen_toolbox_data(lua_State *L) {
   lua_setfield(L, -2, "__index");
 
   luaL_setfuncs(L, datalib_m, 0);
-
-  luaL_newmetatable(L, DATASLICE_M_NAME);
-
-  lua_pushvalue(L, -1);
-  lua_setfield(L, -2, "__index");
-
-  luaL_setfuncs(L, dataslicelib_m, 0);
 
   luaL_newlib(L, datalib_f);
 

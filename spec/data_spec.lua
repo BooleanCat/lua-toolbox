@@ -151,33 +151,4 @@ describe('data', function()
       end)
     end)
   end)
-
-  describe('slice', function()
-    it('creates a slice referring to the data', function()
-      assert.are_equal(
-        data.new('pikachu'),
-        debug.getuservalue(data.new('pikachu'):slice(2, 3), 1)
-      )
-    end)
-  end)
-end)
-
-describe('dataslice', function()
-  describe('__len', function()
-    it('has the length of the size requested', function()
-      assert.are_equal(
-        3,
-        #data.new('pikachu'):slice(2, 3)
-      )
-    end)
-
-    when('instantiated with an offset out of bounds', function()
-      it('has length 0', function()
-        assert.are_equal(
-          0,
-          #data.new('pikachu'):slice(10, 4)
-        )
-      end)
-    end)
-  end)
 end)
