@@ -27,6 +27,10 @@ build = {
     ['toolbox.buffer'] = {
       sources = {'src/lib/buffer.c'},
       incdirs = {'src/include'}
+    },
+    ['toolbox.data'] = {
+      sources = {'src/lib/data.c'},
+      incdirs = {'src/include'}
     }
   }
 }
