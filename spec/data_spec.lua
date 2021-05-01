@@ -111,10 +111,42 @@ describe('data', function()
     end)
   end)
 
-  it('has function stubs', function()
-    local bytes = data.new()
+  describe('__concat', function()
+    when('concatenating two empty data values', function()
+      it('returns an empty data', function()
+        assert.are.equal(
+          data.new(),
+          data.new() .. data.new()
+        )
+      end)
+    end)
 
-    assert.are.equal('function', type(bytes.__concat))
+    when('concatenating an empty and a non-empty data value', function()
+      it('returns an empty data', function()
+        assert.are.equal(
+          data.new('pikachu'),
+          data.new('pikachu') .. data.new()
+        )
+      end)
+    end)
+
+    when('concatenating a non-empty and an empty data value', function()
+      it('returns an empty data', function()
+        assert.are.equal(
+          data.new('charmander'),
+          data.new('') .. data.new('charmander')
+        )
+      end)
+    end)
+
+    when('concatenating two non-empty data values', function()
+      it('returns an empty data', function()
+        assert.are.equal(
+          data.new('Go, charmander!'),
+          data.new('Go, ') .. data.new('charmander!')
+        )
+      end)
+    end)
   end)
 end)
 

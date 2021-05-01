@@ -117,8 +117,31 @@ static int __len(lua_State *L) {
 }
 
 static int __concat(lua_State *L) {
-  Data *data = toolbox_checkdata(L, 1);
-  return 0;
+  Data *a = toolbox_checkdata(L, 1);
+  Data *b = toolbox_checkdata(L, 2);
+
+  size_t size = a->size + b->size;
+
+  Data *data = (Data *)lua_newuserdata(L, sizeof(Data));
+  data->size = size;
+  data->data = (char *)malloc(sizeof(char) * size);
+
+  memcpy(
+    (void *)data->data,
+    (void *)a->data,
+    sizeof(char) * a->size
+  );
+
+  memcpy(
+    (void *)data->data + a->size,
+    (void *)b->data,
+    sizeof(char) * b->size
+  );
+
+  luaL_getmetatable(L, DATA_M_NAME);
+  lua_setmetatable(L, -2);
+
+  return 1;
 }
 
 static int __gc(lua_State *L) {
