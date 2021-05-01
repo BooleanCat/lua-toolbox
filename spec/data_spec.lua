@@ -7,6 +7,21 @@ describe('data', function()
     it('does not return nil', function()
       assert.is_not_nil(data.new())
     end)
+
+    it('can be instantiated with a string', function()
+      assert.is_not_nil(data.new('test'))
+    end)
+
+    it('can be instantiated with an integer', function()
+      assert.is_not_nil(data.new(10))
+    end)
+
+    it('cannot be instantiated with an invalid type', function()
+      assert.has_error(
+        function() data.new({}) end,
+        "bad argument #1 to 'new' (string or integer expected, got table)"
+      )
+    end)
   end)
 
   it('has function stubs', function()

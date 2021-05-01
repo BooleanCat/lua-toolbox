@@ -1,9 +1,16 @@
+#include <stdbool.h>
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
 #include "data.h"
 
 static int new(lua_State *L) {
+  if (lua_gettop(L) > 0) {
+    if (!lua_isinteger(L, 1) && !lua_isstring(L, 1)) {
+      luaL_argexpected(L, false, 1, "string or integer");
+    }
+  }
+
   Data *data = (Data *)lua_newuserdata(L, sizeof(Data));
   data->size = 0;
   data->data = NULL;
