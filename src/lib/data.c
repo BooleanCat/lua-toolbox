@@ -1,4 +1,6 @@
 #include <stdbool.h>
+#include <string.h>
+#include <stdlib.h>
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -18,7 +20,9 @@ static int new_empty(lua_State *L) {
 static int new_from_integer(lua_State *L, size_t size) {
   Data *data = (Data *)lua_newuserdata(L, sizeof(Data));
   data->size = size;
-  data->data = NULL;
+  data->data = (char *)malloc(sizeof(char) * size);
+
+  memset(data->data, 0, sizeof(char) * data->size);
 
   luaL_getmetatable(L, DATA_M_NAME);
   lua_setmetatable(L, -2);
@@ -29,7 +33,9 @@ static int new_from_integer(lua_State *L, size_t size) {
 static int new_from_string(lua_State *L, size_t size, const char *str) {
   Data *data = (Data *)lua_newuserdata(L, sizeof(Data));
   data->size = size;
-  data->data = NULL;
+  data->data = (char *)malloc(sizeof(char) * size);
+
+  memcpy((void *)data->data, (void *)str, sizeof(char) * size);
 
   luaL_getmetatable(L, DATA_M_NAME);
   lua_setmetatable(L, -2);
@@ -62,7 +68,33 @@ static int __eq(lua_State *L) {
 
 static int __tostring(lua_State *L) {
   Data *data = toolbox_checkdata(L, 1);
-  return 0;
+
+  if (data->size == 0) {
+    lua_pushstring(L, "[]");
+    return 1;
+  }
+
+  luaL_Buffer buffer;
+
+  // Number of characters to write
+  size_t size = sizeof(char) * (2 + 3 * data->size - 1);
+
+  luaL_buffinitsize(L, &buffer, size);
+  luaL_addchar(&buffer, '[');
+
+  char *addr = luaL_prepbuffsize(&buffer, size - 1);
+
+  for (size_t i = 0; i < data->size; i++) {
+    sprintf(addr, "%02X ", data->data[i]);
+    addr += 3;
+  }
+
+  luaL_addsize(&buffer, size - 2);
+  luaL_addchar(&buffer, ']');
+
+  luaL_pushresult(&buffer);
+
+  return 1;
 }
 
 static int __len(lua_State *L) {
@@ -74,6 +106,15 @@ static int __len(lua_State *L) {
 
 static int __concat(lua_State *L) {
   Data *data = toolbox_checkdata(L, 1);
+  return 0;
+}
+
+static int __gc(lua_State *L) {
+  Data *data = toolbox_checkdata(L, 1);
+
+  free((void *)data->data);
+  data->data = NULL;
+
   return 0;
 }
 
@@ -95,6 +136,7 @@ static const struct luaL_Reg datalib_m[] = {
   {"__tostring", __tostring},
   {"__len", __len},
   {"__concat", __concat},
+  {"__gc", __gc},
   {NULL, NULL}
 };
 
