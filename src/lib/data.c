@@ -50,6 +50,11 @@ static int new(lua_State *L) {
   luaL_argexpected(L, false, 1, "string or integer");
 }
 
+static const struct luaL_Reg datalib_f[] = {
+  {"new", new},
+  {NULL, NULL}
+};
+
 static int __eq(lua_State *L) {
   Data *a = toolbox_checkdata(L, 1);
   Data *b = toolbox_checkdata(L, 2);
@@ -98,7 +103,7 @@ static int __tostring(lua_State *L) {
   return 1;
 }
 
-static int __len(lua_State *L) {
+static int data__len(lua_State *L) {
   Data *data = toolbox_checkdata(L, 1);
 
   lua_pushinteger(L, data->size);
@@ -151,6 +156,11 @@ static int slice(lua_State *L) {
   s->offset = offset;
   s->size = size;
 
+  if (offset > data->size) {
+    s->offset = data-> size + 1;
+    s->size = 0;
+  }
+
   luaL_getmetatable(L, DATASLICE_M_NAME);
   lua_setmetatable(L, -2);
 
@@ -162,18 +172,25 @@ static int slice(lua_State *L) {
   return 1;
 }
 
-static const struct luaL_Reg datalib_f[] = {
-  {"new", new},
-  {NULL, NULL}
-};
-
 static const struct luaL_Reg datalib_m[] = {
   {"__eq", __eq},
   {"__tostring", __tostring},
-  {"__len", __len},
+  {"__len", data__len},
   {"__concat", __concat},
   {"__gc", __gc},
   {"slice", slice},
+  {NULL, NULL}
+};
+
+static int dataslice__len(lua_State *L) {
+  DataSlice *s = toolbox_checkdataslice(L, 1);
+
+  lua_pushinteger(L, s->size);
+  return 1;
+}
+
+static const struct luaL_Reg dataslicelib_m[] = {
+  {"__len", dataslice__len},
   {NULL, NULL}
 };
 
@@ -189,6 +206,8 @@ int luaopen_toolbox_data(lua_State *L) {
 
   lua_pushvalue(L, -1);
   lua_setfield(L, -2, "__index");
+
+  luaL_setfuncs(L, dataslicelib_m, 0);
 
   luaL_newlib(L, datalib_f);
 
