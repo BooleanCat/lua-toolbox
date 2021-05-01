@@ -1,5 +1,5 @@
 local buffer = require('toolbox.buffer')
-local bytes = require('toolbox.bytes')
+local data = require('toolbox.data')
 
 local when = describe
 
@@ -13,27 +13,27 @@ describe('buffer', function()
       assert.are.equal(0, #buffer.new())
     end)
 
-    when('initialised with a toolbox.bytes', function()
+    when('initialised with a toolbox.data', function()
       it('has initial length of the argument', function()
-        assert.are.equal(3, #buffer.new(bytes.new('foo')))
+        assert.are.equal(3, #buffer.new(data.new('foo')))
       end)
     end)
 
-    when('called with something other than a toolbox.bytes', function()
+    when('called with something other than a toolbox.data', function()
       it('returns an error', function()
         assert.has_error(
           function() buffer.new('foo') end,
-          "bad argument #1 to 'new' (toolbox.bytes expected, got string)"
+          "bad argument #1 to 'new' (toolbox.data expected, got string)"
         )
       end)
     end)
   end)
 
-  describe('bytes', function()
+  describe('data', function()
     it('returns a copy of the buffer contents', function()
       assert.are.equal(
-        bytes.new('foo'),
-        buffer.new(bytes.new('foo')):bytes()
+        data.new('foo'),
+        buffer.new(data.new('foo')):data()
       )
     end)
   end)
@@ -42,138 +42,138 @@ describe('buffer', function()
     it('represents the buffer size', function()
       assert.are.equal(
         'toolbox.buffer[5]',
-        string.format('%s', buffer.new(bytes.new('hello')))
+        string.format('%s', buffer.new(data.new('hello')))
       )
     end)
   end)
 
   describe('__tbread', function()
-    it('reads bytes into a toolbox.bytes', function()
-      local buf = buffer.new(bytes.new('hello'))
-      local b = bytes.new(5)
+    it('reads data into a toolbox.data', function()
+      local buf = buffer.new(data.new('hello'))
+      local d = data.new(5)
 
-      local n, done = buf:__tbread(b)
+      local n, done = buf:__tbread(d)
 
       assert.are.equal(5, n)
       assert.is_true(done)
-      assert.are.equal(bytes.new('hello'), b)
+      assert.are.equal(data.new('hello'), d)
     end)
 
     when('the destination is smaller', function()
       it('reads as much as possible into the destination', function()
-        local buf = buffer.new(bytes.new('hello'))
-        local b = bytes.new(3)
+        local buf = buffer.new(data.new('hello'))
+        local d = data.new(3)
 
-        local n, done = buf:__tbread(b)
+        local n, done = buf:__tbread(d)
 
         assert.are.equal(3, n)
         assert.is_nil(done)
-        assert.are.equal(bytes.new('hel'), b)
+        assert.are.equal(data.new('hel'), d)
       end)
     end)
 
     when('the destination is larger', function()
       it('reads the entire buffer', function()
-        local buf = buffer.new(bytes.new('hello'))
-        local b = bytes.new(7)
+        local buf = buffer.new(data.new('hello'))
+        local d = data.new(7)
 
-        local n, done = buf:__tbread(b)
+        local n, done = buf:__tbread(d)
 
         assert.are.equal(5, n)
         assert.is_true(done)
         assert.are.equal(
           '[68 65 6C 6C 6F 00 00]',
-          string.format('%s', b)
+          string.format('%s', d)
         )
       end)
     end)
 
     when('a read has already occurred', function()
       it('continues reading from where it last finished', function()
-        local buf = buffer.new(bytes.new('hello'))
-        local b = bytes.new(3)
+        local buf = buffer.new(data.new('hello'))
+        local d = data.new(3)
 
-        local n, done = buf:__tbread(b)
+        local n, done = buf:__tbread(d)
         assert.are.equal(3, n)
         assert.is_nil(done)
-        assert.are.equal(bytes.new('hel'), b)
+        assert.are.equal(data.new('hel'), d)
 
-        n, done = buf:__tbread(b)
+        n, done = buf:__tbread(d)
         assert.are.equal(2, n)
         assert.is_true(done)
-        assert.are.equal(bytes.new('lol'), b)
+        assert.are.equal(data.new('lol'), d)
 
-        n, done = buf:__tbread(b)
+        n, done = buf:__tbread(d)
         assert.are.equal(0, n)
         assert.is_true(done)
-        assert.are.equal(bytes.new('lol'), b)
+        assert.are.equal(data.new('lol'), d)
       end)
     end)
 
-    when('pass the wrong type of argument', function()
+    when('passing the wrong type of argument', function()
       it('raises an error', function()
-        local buf = buffer.new(bytes.new('hello'))
+        local buf = buffer.new(data.new('hello'))
 
         assert.has_error(
           function() buf:__tbread({}) end,
-          "bad argument #1 to '__tbread' (toolbox.bytes expected, got table)"
+          "bad argument #1 to '__tbread' (toolbox.data expected, got table)"
         )
       end)
     end)
   end)
 
   describe('__tbwrite', function()
-    it('reads bytes from a toolbox.bytes into the buffer', function()
-      local b = bytes.new('hello')
+    it('reads data from a toolbox.data into the buffer', function()
+      local d = data.new('hello')
       local buf = buffer.new()
 
-      local n, err = buf:__tbwrite(b)
+      local n, err = buf:__tbwrite(d)
       assert.are.equal(5, n)
       assert.is_nil(err)
-      assert.are.equal(bytes.new('hello'), buf:bytes())
+      assert.are.equal(data.new('hello'), buf:data())
     end)
 
     when('called multiple time', function()
-      it('reads bytes from a toolbox.bytes into the buffer', function()
-        local b = bytes.new('hello')
+      it('reads data from a toolbox.data into the buffer', function()
+        local d = data.new('hello')
         local buf = buffer.new()
 
-        local n, err = buf:__tbwrite(b)
+        local n, err = buf:__tbwrite(d)
         assert.are.equal(5, n)
         assert.is_nil(err)
-        assert.are.equal(bytes.new('hello'), buf:bytes())
+        assert.are.equal(data.new('hello'), buf:data())
 
-        n, err = buf:__tbwrite(b)
+        n, err = buf:__tbwrite(d)
         assert.are.equal(5, n)
         assert.is_nil(err)
-        assert.are.equal(bytes.new('hellohello'), buf:bytes())
+        assert.are.equal(data.new('hellohello'), buf:data())
       end)
     end)
 
     when('writing more than the capacity', function()
       it('grows', function()
-        local b = bytes.new('hello')
+        local d = data.new('hello')
         local buf = buffer.new()
 
         for _ = 1, 20 do
-          local n, err = buf:__tbwrite(b)
+          local n, err = buf:__tbwrite(d)
           assert.are.equal(5, n)
           assert.is_nil(err)
         end
 
-        assert.are.equal(100, #buf:bytes())
+        assert.are.equal(100, #buf:data())
       end)
     end)
   end)
 
   describe('reset', function()
     it('empties the buffer', function()
-      local buf = buffer.new(bytes.new('hello'))
-      assert.are.equal(bytes.new('hello'), buf:bytes())
+      local buf = buffer.new(data.new('hello'))
+      assert.are.equal(data.new('hello'), buf:data())
 
       buf:reset()
 
-      assert.are.equal(0, #buf:bytes())
+      assert.are.equal(0, #buf:data())
     end)
   end)
 end)

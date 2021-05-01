@@ -20,10 +20,6 @@ dependencies = {
 build = {
   type = 'builtin',
   modules = {
-    ['toolbox.bytes'] = {
-      sources = {'src/lib/bytes.c'},
-      incdirs = {'src/include'}
-    },
     ['toolbox.buffer'] = {
       sources = {'src/lib/buffer.c'},
       incdirs = {'src/include'}
