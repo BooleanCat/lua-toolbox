@@ -62,8 +62,20 @@ static int new(lua_State *L) {
 }
 
 static int __eq(lua_State *L) {
-  Data *data = toolbox_checkdata(L, 1);
-  return 0;
+  Data *a = toolbox_checkdata(L, 1);
+  Data *b = toolbox_checkdata(L, 2);
+
+  if (a->size != b-> size) {
+    lua_pushboolean(L, false);
+    return 1;
+  }
+
+  lua_pushboolean(L, memcmp(
+    a->data,
+    b->data,
+    sizeof(char) * a->size
+  ) == 0);
+  return 1;
 }
 
 static int __tostring(lua_State *L) {

@@ -73,10 +73,47 @@ describe('data', function()
     end)
   end)
 
+  describe('__eq', function()
+    when('tested with two empty data values', function()
+      it('considers them equal', function()
+        assert.is_true(data.new() == data.new())
+      end)
+    end)
+
+    when('tested with two values of different length', function()
+      it('considers them not equal', function()
+        assert.is_false(data.new() == data.new(1))
+      end)
+    end)
+
+    when('tested with two values of equal length but different content', function()
+      it('considers them not equal', function()
+        assert.is_false(
+          data.new('charmander') == data.new('bulbasaur')
+        )
+      end)
+    end)
+
+    when('tested with two values of equal length but different content', function()
+      it('considers them not equal', function()
+        assert.is_false(
+          data.new('gengar') == data.new('mewtwo')
+        )
+      end)
+    end)
+
+    when('tested with two values of equal length and equal content', function()
+      it('considers them not equal', function()
+        assert.is_true(
+          data.new('pikachu') == data.new('pikachu')
+        )
+      end)
+    end)
+  end)
+
   it('has function stubs', function()
     local bytes = data.new()
 
-    assert.are.equal('function', type(bytes.__eq))
     assert.are.equal('function', type(bytes.__concat))
   end)
 end)
