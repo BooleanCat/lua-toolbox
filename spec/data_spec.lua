@@ -151,4 +151,31 @@ describe('data', function()
       end)
     end)
   end)
+
+  describe('slice', function()
+    it('creates a toolbox.data', function()
+      assert.are_equal(
+        'toolbox.data',
+        debug.getmetatable(data.new():slice(1)).__name
+      )
+    end)
+
+    when("instantiated with an offset greater than the data's length", function()
+      it('has length 0', function()
+        assert.are_equal(0, #data.new('squirtle'):slice(20))
+      end)
+    end)
+
+    when("instantiated with size greater than the remaining data following offset", function()
+      it('has the length of the remainder', function()
+        assert.are_equal(6, #data.new('squirtle'):slice(3))
+      end)
+    end)
+
+    when("instantiated with size greater less the remaining data following offset", function()
+      it('has the length of that size', function()
+        assert.are_equal(2, #data.new('squirtle'):slice(3, 2))
+      end)
+    end)
+  end)
 end)

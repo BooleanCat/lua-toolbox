@@ -10,6 +10,7 @@ static int new_from_integer(lua_State *L, size_t size) {
   Data *data = (Data *)lua_newuserdata(L, sizeof(Data));
   data->size = size;
   data->data = (char *)malloc(sizeof(char) * size);
+  data->reference = false;
 
   memset(data->data, 0, sizeof(char) * data->size);
 
@@ -23,6 +24,7 @@ static int new_from_string(lua_State *L, size_t size, const char *str) {
   Data *data = (Data *)lua_newuserdata(L, sizeof(Data));
   data->size = size;
   data->data = (char *)malloc(sizeof(char) * size);
+  data->reference = false;
 
   memcpy((void *)data->data, (void *)str, sizeof(char) * size);
 
@@ -119,6 +121,7 @@ static int __concat(lua_State *L) {
   Data *data = (Data *)lua_newuserdata(L, sizeof(Data));
   data->size = size;
   data->data = (char *)malloc(sizeof(char) * size);
+  data->reference = false;
 
   memcpy(
     (void *)data->data,
@@ -141,10 +144,46 @@ static int __concat(lua_State *L) {
 static int __gc(lua_State *L) {
   Data *data = toolbox_checkdata(L, 1);
 
-  free((void *)data->data);
-  data->data = NULL;
+  if (!data->reference) {
+    free((void *)data->data);
+    data->data = NULL;
+  }
 
   return 0;
+}
+
+static int slice(lua_State *L) {
+  Data *data = toolbox_checkdata(L, 1);
+  size_t offset = luaL_checkinteger(L, 2);
+
+  size_t size;
+  if (lua_gettop(L) > 2) {
+    size = luaL_checkinteger(L, 3);
+  } else {
+    // Maximum size for unsigned size_t
+    size = -1;
+  }
+
+  Data *new_data = (Data *)lua_newuserdata(L, sizeof(Data));
+  new_data->reference = true;
+
+  if (offset > data->size) {
+    new_data->data = NULL;
+    new_data->size = 0;
+  } else {
+    new_data->data = data->data + offset - 1;
+    new_data->size = MIN(size, 1 + data->size - offset);
+  }
+
+  luaL_getmetatable(L, DATA_M_NAME);
+  lua_setmetatable(L, -2);
+
+  lua_insert(L, 1);
+  lua_settop(L, 2);
+
+  lua_setiuservalue(L, 1, 1);
+
+  return 1;
 }
 
 static const struct luaL_Reg datalib_m[] = {
@@ -153,6 +192,7 @@ static const struct luaL_Reg datalib_m[] = {
   {"__len", data__len},
   {"__concat", __concat},
   {"__gc", __gc},
+  {"slice", slice},
   {NULL, NULL}
 };
 
