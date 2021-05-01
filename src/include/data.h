@@ -15,7 +15,6 @@ typedef struct Data {
 typedef struct DataSlice {
   size_t offset;
   size_t size;
-  Data *data;
 } DataSlice;
 
 #endif

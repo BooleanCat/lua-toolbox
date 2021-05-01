@@ -4,8 +4,11 @@ local when = describe
 
 describe('data', function()
   describe('new', function()
-    it('does not return nil', function()
-      assert.is_not_nil(data.new())
+    it('creates a toolbox.data', function()
+      assert.are_equal(
+        'toolbox.data',
+        debug.getmetatable(data.new()).__name
+      )
     end)
 
     it('can be instantiated with a string', function()
@@ -148,16 +151,13 @@ describe('data', function()
       end)
     end)
   end)
-end)
 
--- A slice will be a reference to some part of data. The slice will contain a
--- weak reference to the original data, an offset and a size.
---
--- Datas will contain references to all of their slices. When a data in garbage
--- collected, it will mark all slices as dead. Future operations against dead
--- slices shall fail.
-describe('slice', function()
-  it('has function stubs', function()
-    assert.are.equal('function', type(data.slice))
+  describe('slice', function()
+    it('creates a slice referring to the data', function()
+      assert.are_equal(
+        data.new('pikachu'),
+        debug.getuservalue(data.new('pikachu'):slice(2, 3), 1)
+      )
+    end)
   end)
 end)
