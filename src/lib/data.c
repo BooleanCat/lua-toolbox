@@ -6,17 +6,6 @@
 #include <lauxlib.h>
 #include "data.h"
 
-static int new_empty(lua_State *L) {
-  Data *data = (Data *)lua_newuserdata(L, sizeof(Data));
-  data->size = 0;
-  data->data = NULL;
-
-  luaL_getmetatable(L, DATA_M_NAME);
-  lua_setmetatable(L, -2);
-
-  return 1;
-}
-
 static int new_from_integer(lua_State *L, size_t size) {
   Data *data = (Data *)lua_newuserdata(L, sizeof(Data));
   data->size = size;
@@ -45,7 +34,7 @@ static int new_from_string(lua_State *L, size_t size, const char *str) {
 
 static int new(lua_State *L) {
   if (lua_gettop(L) == 0) {
-    return new_empty(L);
+    return new_from_integer(L, 0);
   }
 
   if (lua_isinteger(L, 1)) {
