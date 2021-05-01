@@ -4,13 +4,7 @@
 #include <lauxlib.h>
 #include "data.h"
 
-static int new(lua_State *L) {
-  if (lua_gettop(L) > 0) {
-    if (!lua_isinteger(L, 1) && !lua_isstring(L, 1)) {
-      luaL_argexpected(L, false, 1, "string or integer");
-    }
-  }
-
+static int new_empty(lua_State *L) {
   Data *data = (Data *)lua_newuserdata(L, sizeof(Data));
   data->size = 0;
   data->data = NULL;
@@ -19,6 +13,46 @@ static int new(lua_State *L) {
   lua_setmetatable(L, -2);
 
   return 1;
+}
+
+static int new_from_integer(lua_State *L, size_t size) {
+  Data *data = (Data *)lua_newuserdata(L, sizeof(Data));
+  data->size = size;
+  data->data = NULL;
+
+  luaL_getmetatable(L, DATA_M_NAME);
+  lua_setmetatable(L, -2);
+
+  return 1;
+}
+
+static int new_from_string(lua_State *L, size_t size, const char *str) {
+  Data *data = (Data *)lua_newuserdata(L, sizeof(Data));
+  data->size = size;
+  data->data = NULL;
+
+  luaL_getmetatable(L, DATA_M_NAME);
+  lua_setmetatable(L, -2);
+
+  return 1;
+}
+
+static int new(lua_State *L) {
+  if (lua_gettop(L) == 0) {
+    return new_empty(L);
+  }
+
+  if (lua_isinteger(L, 1)) {
+    return new_from_integer(L, luaL_checkinteger(L, 1));
+  }
+
+  if (lua_isstring(L, 1)) {
+    size_t size;
+    const char *str = luaL_checklstring(L, 1, &size);
+    return new_from_string(L, size, str);
+  }
+
+  luaL_argexpected(L, false, 1, "string or integer");
 }
 
 static int __eq(lua_State *L) {
@@ -33,7 +67,9 @@ static int __tostring(lua_State *L) {
 
 static int __len(lua_State *L) {
   Data *data = toolbox_checkdata(L, 1);
-  return 0;
+
+  lua_pushinteger(L, data->size);
+  return 1;
 }
 
 static int __concat(lua_State *L) {
