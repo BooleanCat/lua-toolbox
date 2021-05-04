@@ -18,6 +18,20 @@ static int buffer_new(lua_State *L) {
   return 1;
 }
 
+static int buffer__len(lua_State *L) {
+  Buffer *buffer = toolbox_checkbuffer(L, 1);
+
+  lua_pushinteger(L, 0);
+  return 1;
+}
+
+static int buffer__tostring(lua_State *L) {
+  Buffer *buffer = toolbox_checkbuffer(L, 1);
+
+  lua_pushstring(L, "");
+  return 1;
+}
+
 static int buffer__gc(lua_State *L) {
   Buffer *buffer = toolbox_checkbuffer(L, 1);
 
@@ -33,6 +47,8 @@ static const struct luaL_Reg bufferlib_f[] = {
 };
 
 static const struct luaL_Reg bufferlib_m[] = {
+  {"__len", buffer__len},
+  {"__tostring", buffer__tostring},
   {NULL, NULL}
 };
 

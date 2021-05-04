@@ -7,4 +7,11 @@ describe('buffer', function()
       debug.getmetatable(buffer.new()).__name
     )
   end)
+
+  it('has method stubs', function()
+    local buf = buffer.new()
+
+    assert.are_equal('function', type(buf.__len))
+    assert.are_equal('function', type(buf.__tostring))
+  end)
 end)
