@@ -1,7 +1,5 @@
 local buffer = require('toolbox.buffer')
 
-local when = describe
-
 describe('buffer', function()
   describe('new', function()
     assert.are_equal(
