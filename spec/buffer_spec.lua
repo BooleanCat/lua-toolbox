@@ -8,9 +8,24 @@ describe('buffer', function()
     )
   end)
 
+  describe('cap', function()
+    it('returns 50 for a new buffer', function()
+      assert.are_equal(50, buffer.new():cap())
+    end)
+  end)
+
   describe('__len', function()
     it('returns 0 for an empty buffer', function()
       assert.are_equal(0, #buffer.new())
+    end)
+  end)
+
+  describe('__tostring', function()
+    it('describes the length and capacity of the buffer', function()
+      assert.are_equal(
+        'toolbox.buffer<0, 50>',
+        string.format('%s', buffer.new())
+      )
     end)
   end)
 

@@ -28,7 +28,12 @@ static int buffer__len(lua_State *L) {
 static int buffer__tostring(lua_State *L) {
   Buffer *buffer = toolbox_checkbuffer(L, 1);
 
-  lua_pushstring(L, "");
+  lua_pushfstring(
+    L,
+    "toolbox.buffer<%d, %d>",
+    buffer->write_cursor - buffer->read_cursor,
+    buffer->capacity
+  );
   return 1;
 }
 
@@ -68,7 +73,8 @@ static int buffer_reset(lua_State *L) {
 static int buffer_cap(lua_State *L) {
   Buffer *buffer = toolbox_checkbuffer(L, 1);
 
-  return 0;
+  lua_pushinteger(L, buffer->capacity);
+  return 1;
 }
 
 static const struct luaL_Reg bufferlib_f[] = {
