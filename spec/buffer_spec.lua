@@ -8,10 +8,15 @@ describe('buffer', function()
     )
   end)
 
+  describe('__len', function()
+    it('returns 0 for an empty buffer', function()
+      assert.are_equal(0, #buffer.new())
+    end)
+  end)
+
   it('has method stubs', function()
     local buf = buffer.new()
 
-    assert.are_equal('function', type(buf.__len))
     assert.are_equal('function', type(buf.__tostring))
     assert.are_equal('function', type(buf.__tbread))
     assert.are_equal('function', type(buf.__tbwrite))
