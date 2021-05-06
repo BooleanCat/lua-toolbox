@@ -1,5 +1,7 @@
 local buffer = require('toolbox.buffer')
 
+local when = describe
+
 describe('buffer', function()
   describe('new', function()
     assert.are_equal(
@@ -29,14 +31,22 @@ describe('buffer', function()
     end)
   end)
 
+  describe('__tbread', function()
+    when('called with an invalid type', function()
+      it('returns an error', function()
+        assert.has_error(
+          function() buffer.new():__tbread({}) end,
+          "bad argument #1 to '__tbread' (toolbox.data expected, got table)"
+        )
+      end)
+    end)
+  end)
+
   it('has method stubs', function()
     local buf = buffer.new()
 
-    assert.are_equal('function', type(buf.__tostring))
-    assert.are_equal('function', type(buf.__tbread))
     assert.are_equal('function', type(buf.__tbwrite))
     assert.are_equal('function', type(buf.data))
     assert.are_equal('function', type(buf.reset))
-    assert.are_equal('function', type(buf.cap))
   end)
 end)

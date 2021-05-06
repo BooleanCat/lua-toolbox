@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "buffer.h"
+#include "data.h"
 
 static int buffer_new(lua_State *L) {
   Buffer *buffer = (Buffer *)lua_newuserdata(L, sizeof(Buffer));
@@ -48,6 +49,7 @@ static int buffer__gc(lua_State *L) {
 
 static int buffer__tbread(lua_State *L) {
   Buffer *buffer = toolbox_checkbuffer(L, 1);
+  Data *data = toolbox_checkdata(L, 2);
 
   return 0;
 }
