@@ -41,6 +41,36 @@ static int buffer__gc(lua_State *L) {
   return 0;
 }
 
+static int buffer__tbread(lua_State *L) {
+  Buffer *buffer = toolbox_checkbuffer(L, 1);
+
+  return 0;
+}
+
+static int buffer__tbwrite(lua_State *L) {
+  Buffer *buffer = toolbox_checkbuffer(L, 1);
+
+  return 0;
+}
+
+static int buffer_data(lua_State *L) {
+  Buffer *buffer = toolbox_checkbuffer(L, 1);
+
+  return 0;
+}
+
+static int buffer_reset(lua_State *L) {
+  Buffer *buffer = toolbox_checkbuffer(L, 1);
+
+  return 0;
+}
+
+static int buffer_cap(lua_State *L) {
+  Buffer *buffer = toolbox_checkbuffer(L, 1);
+
+  return 0;
+}
+
 static const struct luaL_Reg bufferlib_f[] = {
   {"new", buffer_new},
   {NULL, NULL}
@@ -49,6 +79,11 @@ static const struct luaL_Reg bufferlib_f[] = {
 static const struct luaL_Reg bufferlib_m[] = {
   {"__len", buffer__len},
   {"__tostring", buffer__tostring},
+  {"__tbread", buffer__tbread},
+  {"__tbwrite", buffer__tbwrite},
+  {"data", buffer_data},
+  {"reset", buffer_reset},
+  {"cap", buffer_cap},
   {NULL, NULL}
 };
 
