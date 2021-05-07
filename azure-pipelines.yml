@@ -6,9 +6,6 @@
 trigger:
 - main
 
-pool:
-  vmImage: ubuntu-latest
-
 container: booleancat/lua-toolbox-ci:latest
 
 steps:
