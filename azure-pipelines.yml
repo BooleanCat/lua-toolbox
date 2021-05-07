@@ -9,7 +9,7 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-container: booleancat/lua-toolbox-ci
+container: booleancat/lua-toolbox-ci:latest
 
 steps:
 - script: echo Hello, world!
