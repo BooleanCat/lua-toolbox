@@ -11,4 +11,4 @@ pool: {vmImage: ubuntu-latest}
 steps:
 - script: |
     pwd
-    docker run booleancat/lua-toolbox-ci:latest ls
+    docker run -v "$(pwd):/lua-toolbox" -w /lua-toolbox booleancat/lua-toolbox-ci:latest ls
