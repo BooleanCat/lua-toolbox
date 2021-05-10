@@ -10,4 +10,4 @@ pool: {vmImage: ubuntu-latest}
 
 steps:
 - script: |
-    docker run -it booleancat/lua-toolbox-ci:latest ls
+    docker run booleancat/lua-toolbox-ci:latest ls
