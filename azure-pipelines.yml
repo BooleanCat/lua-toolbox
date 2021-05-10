@@ -12,6 +12,4 @@ container: booleancat/lua-toolbox-ci:latest
 
 steps:
 - script: |
-    make check
-    make build
-    make test
+    docker run -it booleancat/lua-toolbox-ci:latest ls
