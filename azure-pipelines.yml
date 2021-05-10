@@ -6,9 +6,15 @@
 trigger:
 - main
 
+resources:
+  containers:
+  - container: test
+    image: 'booleancat/lua-toolbox-ci:latest'
+
 jobs:
 - job: Test
   pool: {vmImage: ubuntu-latest}
   steps:
   - script: |
       echo 'Hello, World!'
+    target: {container: test}
