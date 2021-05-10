@@ -4,10 +4,11 @@
 # https://aka.ms/yaml
 
 trigger:
-- main
+- azuredevops
 
 pool: {vmImage: ubuntu-latest}
 
 steps:
 - script: |
+    ls
     docker run booleancat/lua-toolbox-ci:latest ls
