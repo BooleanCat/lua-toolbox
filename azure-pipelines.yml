@@ -12,5 +12,6 @@ container: booleancat/lua-toolbox-ci:latest
 
 steps:
 - script: |
-    echo 'Hello, World!'
-  target: {container: test}
+    make check
+    make build
+    make test
