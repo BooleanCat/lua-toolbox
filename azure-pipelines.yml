@@ -10,10 +10,8 @@ pool: {vmImage: ubuntu-latest}
 
 steps:
 - script: |
-    pwd
     docker run -v "$(pwd):/lua-toolbox" -w /lua-toolbox booleancat/lua-toolbox-ci:latest make check
   displayName: Check
 - script: |
-    pwd
     docker run -v "$(pwd):/lua-toolbox" -w /lua-toolbox booleancat/lua-toolbox-ci:latest make && make test
   displayName: Test
