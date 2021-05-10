@@ -8,8 +8,6 @@ trigger:
 
 pool: {vmImage: ubuntu-latest}
 
-container: booleancat/lua-toolbox-ci:latest
-
 steps:
 - script: |
     docker run -it booleancat/lua-toolbox-ci:latest ls
