@@ -42,10 +42,20 @@ describe('buffer', function()
     end)
   end)
 
+  describe('__tbwrite', function()
+    when('called with an invalid type', function()
+      it('reurns an error', function()
+        assert.has_error(
+          function() buffer.new():__tbwrite({}) end,
+          "bad argument #1 to '__tbwrite' (toolbox.data expected, got table)"
+        )
+      end)
+    end)
+  end)
+
   it('has method stubs', function()
     local buf = buffer.new()
 
-    assert.are_equal('function', type(buf.__tbwrite))
     assert.are_equal('function', type(buf.data))
     assert.are_equal('function', type(buf.reset))
   end)

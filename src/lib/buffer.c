@@ -56,6 +56,7 @@ static int buffer__tbread(lua_State *L) {
 
 static int buffer__tbwrite(lua_State *L) {
   Buffer *buffer = toolbox_checkbuffer(L, 1);
+  Data *data = toolbox_checkdata(L, 2);
 
   return 0;
 }
