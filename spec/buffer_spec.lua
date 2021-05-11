@@ -1,13 +1,37 @@
 local buffer = require('toolbox.buffer')
+local data = require('toolbox.data')
 
 local when = describe
 
 describe('buffer', function()
   describe('new', function()
-    assert.are_equal(
-      'toolbox.buffer',
-      debug.getmetatable(buffer.new()).__name
-    )
+    it('creates a toolbox.buffer', function()
+      assert.are_equal(
+        'toolbox.buffer',
+        debug.getmetatable(buffer.new()).__name
+      )
+    end)
+
+    when('initialised with a toolbox.data', function()
+      it('buffers the data', function()
+        local buf = buffer.new(data.new('squirtle'))
+
+        assert.are_equal(
+          'toolbox.buffer',
+          debug.getmetatable(buf).__name
+        )
+        assert.are_equal(data.new('squirtle'), buf:data())
+      end)
+    end)
+
+    when('initialised with an invalid type', function()
+      it('returns an error', function()
+        assert.has_error(
+          function() buffer.new({}) end,
+          "bad argument #1 to 'new' (toolbox.data expected, got table)"
+        )
+      end)
+    end)
   end)
 
   describe('cap', function()
@@ -43,6 +67,14 @@ describe('buffer', function()
   end)
 
   describe('__tbwrite', function()
+    it('writes data to the buffer', function()
+      local buf = buffer.new()
+      local size = buf:__tbwrite(data.new('pikachu'))
+
+      assert.are_equal(7, size)
+      assert.are_equal(data.new('pikachu'), buf:data())
+    end)
+
     when('called with an invalid type', function()
       it('reurns an error', function()
         assert.has_error(
@@ -53,10 +85,24 @@ describe('buffer', function()
     end)
   end)
 
-  it('has method stubs', function()
-    local buf = buffer.new()
+  describe('data', function()
+    it('returns empty data for an empty buffer', function()
+      assert.are_equal(
+        data.new(),
+        buffer.new():data()
+      )
+    end)
+  end)
 
-    assert.are_equal('function', type(buf.data))
-    assert.are_equal('function', type(buf.reset))
+  describe('reset', function()
+    it('clears the buffer', function()
+      local buf = buffer.new(data.new('charmander'))
+      buf:reset()
+
+      local destination = data.new(10)
+
+      local n = buf:__tbread(destination)
+      assert.are_equal(0, n)
+    end)
   end)
 end)
