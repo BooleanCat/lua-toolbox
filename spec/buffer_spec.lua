@@ -88,7 +88,7 @@ describe('buffer', function()
       pending('grows', function()
         local buf = buffer.new()
 
-        for i = 1, 10 do
+        for _ = 1, 10 do
           assert.are_equal(10, buf:__tbwrite(data.new('charmander')))
         end
 
