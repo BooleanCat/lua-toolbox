@@ -75,6 +75,27 @@ describe('buffer', function()
       assert.are_equal(data.new('pikachu'), buf:data())
     end)
 
+    it('writes data sequentially', function()
+      local buf = buffer.new()
+
+      assert.are_equal(7, buf:__tbwrite(data.new('pikachu')))
+      assert.are_equal(11, buf:__tbwrite(data.new(' charmander')))
+
+      assert.are_equal(data.new('pikachu charmander'), buf:data())
+    end)
+
+    when('writing more data than the cap would accomodate', function()
+      pending('grows', function()
+        local buf = buffer.new()
+
+        for i = 1, 10 do
+          assert.are_equal(10, buf:__tbwrite(data.new('charmander')))
+        end
+
+        assert.are_equal(100, #buf:data())
+      end)
+    end)
+
     when('called with an invalid type', function()
       it('reurns an error', function()
         assert.has_error(
